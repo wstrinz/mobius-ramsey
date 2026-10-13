@@ -1,5 +1,9 @@
 # mobius-ramsey
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23339522.svg)](https://doi.org/10.5281/zenodo.23339522)
+
+Archived on Zenodo. Cite all versions with the concept DOI [10.5281/zenodo.23339522](https://doi.org/10.5281/zenodo.23339522); v1.0.0 specifically is [10.5281/zenodo.23339523](https://doi.org/10.5281/zenodo.23339523).
+
 **Möbius invariance of the Ramsey property for finite spherical sets, proved in Lean 4.**
 
 A finite set of points in Euclidean space is *Ramsey* if for every number of colours `r ≥ 2`
