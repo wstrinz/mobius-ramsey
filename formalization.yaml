@@ -1,0 +1,232 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+version: "v0.4"
+
+project:
+  name: "Möbius invariance of the Ramsey property for finite spherical sets"
+  description: >-
+    Theorem C: for finitely many distinct points a of the unit sphere of R^d and
+    any L in O(1,d) (L^T S L = S with S = diag(-1, 1, ..., 1)), the configuration
+    a is Euclidean Ramsey if and only if its image under the Möbius map phi_L is
+    Euclidean Ramsey. There is no affine-spanning hypothesis. Ramsey is OpenAI's
+    definition from result 172 (for every r >= 2 there is D such that every
+    r-colouring of R^D contains a monochromatic congruent copy). Corollaries,
+    also proved: every Möbius image of a finite set of distinct unit-sphere
+    points with real algebraic coordinates is Ramsey; and for distinct rationals
+    t_i and arbitrary reals k != 0 and c, the circle points circ(k t_i) and
+    circ(t_i + c) form Ramsey sets, where circ is the stereographic chart of the
+    unit circle. The proof builds on OpenAI's complete Lean proof of the
+    classification of finite Euclidean Ramsey configurations (openai/math
+    fd4aeeb2, result 172), whose 28 files are included with header-only changes
+    for the Lean module system. The Lorentz matrix transports OpenAI's real
+    tensor criterion; OpenAI's descent and sufficiency conclude. All theorems
+    depend on propext, Classical.choice and Quot.sound only.
+  authors:
+    - "Will Strinz"
+  license: "MIT"
+  responsible_maintainers:
+    - "Will Strinz"
+
+classification:
+  arxiv: ["math.CO", "math.MG"]
+  msc2020: ["05D10", "52C10", "51B10"]
+
+sources:
+  - title: "Ramsey-ness of finite spherical sets is Möbius invariant (the note in note/mobius.tex of this repository)"
+    type: original-proof
+    authors:
+      - "Will Strinz"
+    location: "note/mobius.tex, Theorem C and Corollary 1"
+    relationship: other
+    note: >-
+      Theorem C is presented in this repository and its accompanying note; no
+      prior statement was found (docs/PRIOR-WORK-SEARCH.md). Pálvölgyi's
+      arXiv:2609.23327, Lemma A.5, proves invariance of his derivation
+      certificates and states that it does not assert Möbius invariance of the
+      Ramsey property itself.
+    author_endorsement: "n/a"
+  - title: "A classification of finite Euclidean Ramsey configurations (OpenAI math release, result 172)"
+    authors:
+      - "OpenAI"
+    id: "https://github.com/openai/math/tree/fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb"
+    type: "preprint and Lean formalization"
+    location: "preprints/A-classification-of-finite-Euclidean-Ramsey-configurations-September-23-2026/ (Theorem 1.1, Proposition 2.1); lean/OAI/Combinatorics/EuclideanRamsey/ (Main.lean import closure)"
+    relationship: other
+    note: >-
+      The foundation. Theorem C is a short consequence of the classification, and
+      its Lean proof imports OpenAI's Lean proof (necessity ramsey_realCriterion,
+      descent realCriterion_fieldCriterion, sufficiency fieldCriterion_ramsey),
+      whose 28 files are included, ported to the module system by header-only
+      changes (docs/PORT-LOG.md). The definitions Space, Congruent and Ramsey are
+      OpenAI's, verbatim. This work trusts OpenAI's Lean proof, which is replayed
+      by the kernels here.
+    license: "Apache-2.0"
+    author_endorsement: "not-contacted"
+  - title: "A cyclic non-Ramsey heptagon"
+    authors:
+      - "Dömötör Pálvölgyi"
+    id: "arXiv:2609.23327"
+    type: "article"
+    location: "Appendix, Lemma A.5"
+    relationship: background
+    note: "Nearest prior statement: Möbius invariance of derivation certificates, with an explicit disclaimer that it does not assert Möbius invariance of the Ramsey property."
+    author_endorsement: "not-contacted"
+  - title: "Spherical sets with algebraic coordinates are Ramsey (Theorem A, used for the corollaries)"
+    authors:
+      - "JD-Jones-ASES"
+      - "Rogerhu12"
+      - "atimics"
+    id: "https://github.com/JD-Jones-ASES/six-concyclic-lean; https://github.com/Rogerhu12/openai-math-extensions; https://github.com/atimics/math2"
+    type: "repositories (Lean and TeX)"
+    location: "six-concyclic-lean root commit 0703d7d; openai-math-extensions commit f8a2bb2, papers/172-euclidean-ramsey/algebraic_spherical_configurations.tex; math2 commit 8ab51fa, EndToEnd/AlgebraicRamsey.lean"
+    relationship: background
+    note: >-
+      Prior statements and proofs of Theorem A: criterion level in Lean (Ramsey
+      conclusion conditional on hsuff), in TeX, and end to end in Lean for
+      algebraic configurations with full affine span (atimics; its written
+      derivation also covers sets similar to algebraic ones). This
+      repository's ramsey_of_algebraic is a further Lean proof on OpenAI's
+      development, not a first one; no code was copied.
+    author_endorsement: "not-contacted"
+
+related_formalizations:
+  - id: "https://github.com/openai/math/tree/fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb/lean/OAI/Combinatorics/EuclideanRamsey"
+    relationship: builds-on
+    note: "OpenAI's Lean proof of the classification; its Main.lean import closure is included (Apache-2.0)."
+  - id: "https://github.com/atimics/math2"
+    relationship: independent
+    note: "Theorem A end to end in Lean for algebraic configurations with full affine span (commit 8ab51fa); used here only as credited prior work."
+  - id: "https://github.com/JD-Jones-ASES/six-concyclic-lean"
+    relationship: independent
+    note: "Theorem A at criterion level in Lean (root commit 0703d7d)."
+
+status:
+  scope: >-
+    Formalized: Theorem C for finitely many distinct points of the unit sphere
+    centred at 0 in R^d and Möbius maps given as phi_L with L in O(1,d), with no
+    spanning hypothesis (ramsey_iff_ramsey_mobius_full); Möbius images of
+    algebraic unit-sphere sets are Ramsey (ramsey_mobius_of_algebraic); the
+    circ(k t_i) and circ(t_i + c) families (ramsey_circ_mul_rat,
+    ramsey_circ_add_rat; algebraic t_i in ramsey_circ_mul, ramsey_circ_add).
+    Not formalized: that for d >= 2 the maps phi_L are exactly the Möbius
+    transformations of the sphere (the classical isomorphism PO(1,d) =
+    Möb(S^{d-1}), cited; for d = 1 it fails, see docs/FIDELITY.md); the
+    reduction from an arbitrary sphere to the unit sphere by a similarity; the
+    cross-ratio and triangle corollaries of the note.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: ["propext", "Classical.choice", "Quot.sound"]
+  main_results:
+    - declaration: "OAI.EuclideanRamsey.Mobius.ramsey_iff_ramsey_mobius_full"
+      file: "MobiusRamsey/Theorem.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+      literature_dependencies:
+        - statement: "For d >= 2, the maps mobiusMap L, L in O(1,d), are the Möbius transformations of the unit sphere (PO(1,d) = Möb(S^{d-1})). For d = 1 the identification fails (boosts act trivially on S^0); the theorem holds there but is not about a Möbius group."
+          source: "classical; cited in note/mobius.tex §2: Ratcliffe, Foundations of Hyperbolic Manifolds, 3rd ed. (GTM 149, 2019), Thm. 3.2.3 and §3.2 Cor. 3, §4.4 Cor. 3, Thm. 4.5.2 and §4.5 Cor. 1; Beardon, The Geometry of Discrete Groups (GTM 91, 1983), §3.7, Thms. 3.7.5-3.7.6, pp. 49-54 (docs/CITATION-SOURCES.md)"
+    - declaration: "OAI.EuclideanRamsey.Mobius.ramsey_mobius_of_algebraic"
+      file: "MobiusRamsey/Corollaries.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "OAI.EuclideanRamsey.Mobius.ramsey_circ_mul_rat"
+      file: "MobiusRamsey/Corollaries.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+    - declaration: "OAI.EuclideanRamsey.Mobius.ramsey_circ_add_rat"
+      file: "MobiusRamsey/Corollaries.lean"
+      sorry_count: 0
+      axioms: ["propext", "Classical.choice", "Quot.sound"]
+      comparator_config: "comparator.json"
+
+automation:
+  methods:
+    - method: "agent"
+      models: ["claude-opus-5-5"]
+      framework: "Claude Code"
+      tool_setup: >-
+        A coordinating Claude Opus 5.5 session dispatched bounded Claude Opus 5.5
+        agents, each in its own git worktree: Lean proofs on top of OpenAI's
+        development (Lean 4, Mathlib, lake build, #print axioms), the module-system
+        port, Comparator runs with negative controls, the step-by-step check of the
+        hand proof, and the documentation. Exact computer-algebra certificates
+        (Python, SymPy) were used while exploring.
+      cost:
+        wall_time: "about two days"
+        spend_usd: "subscription-based"
+        hardware: "one desktop machine (Windows and WSL Ubuntu)"
+      prompting_notes: >-
+        Written task packets with explicit status tags, time boxes and hard rules
+        (no weakened statements, standard axioms only, no sorry or native_decide).
+    - method: "agent"
+      models: ["claude-sonnet-5-5"]
+      framework: "Claude Code"
+      tool_setup: "Read-only agents for the prior-work searches (arXiv API, GitHub, the Palomar registry, MathOverflow), for a fresh reproduction of an earlier build, and for a fresh reproduction of this package from README.md and REPRODUCE.md."
+    - method: "other"
+      models: []
+      framework: "Claude (chat)"
+      tool_setup: "The exploratory conversation (claude.ai, Claude Opus 5.5) in which Theorem C and its proof first appeared."
+  spend_usd: "subscription-based"
+  notes: >-
+    Will Strinz directed the work and made every release decision; he read the
+    hand proof of Theorem C line by line (an owner's read, not expert review).
+    The proofs, the port and the checks were produced by AI agents. See
+    DISCLOSURE.md.
+
+fidelity:
+  divergences: >-
+    Ramsey, Congruent and Space are OpenAI's definitions, verbatim. A Möbius
+    transformation of S^{d-1} is modelled as mobiusMap L for a real matrix L with
+    L^T S L = S, acting on the null lines of S; for d >= 2 the identification
+    with the Möbius group is classical and not formalized (for d = 1 boosts act
+    trivially on S^0, so phi_L is not a faithful model of a Möbius group there;
+    the theorem still holds). mobiusMap divides by the time coordinate, which is
+    nonzero on the sphere (proved); off the sphere the map is not meaningful,
+    and the theorems only evaluate it on the sphere. Points are an injective
+    family on the unit sphere centred at 0; the note's statement for an
+    arbitrary sphere reduces to this by a similarity, by hand. The circle
+    corollaries use circ(t) = ((1 - t^2)/(1 + t^2), 2t/(1 + t^2)), the chart from
+    the pole (-1, 0). Nine lines of non-Mathlib, non-OpenAI definitions in total
+    (lorentzForm, aug, mobiusMap, circ). Item-by-item table: docs/FIDELITY.md.
+
+review:
+  status: "self-assessed"
+  reviewers:
+    - "Will Strinz (owner's read of the hand proof of Theorem C; not expert review)"
+  notes: >-
+    Statements audited by the Claude agents that wrote them, and checked by lake
+    comparator against a Mathlib-only Challenge.lean, with five negative controls
+    refused (sorry, redefined Ramsey, redefined lorentzForm, redefined circ,
+    Theorem C without injectivity). The hand proof was checked step by step by a
+    Claude agent. A Claude Opus 5.5 agent that did not build the package
+    reviewed the fidelity of the statements (faithful; its fixes to prose,
+    metadata and credit wording were applied), and a Claude Sonnet 5.5 agent
+    reproduced the package from README.md and REPRODUCE.md alone. Item-by-item
+    fidelity table: docs/FIDELITY.md. No independent human expert review.
+
+alignment:
+  namespace: "OAI.EuclideanRamsey.Mobius"
+  statements:
+    - source: "note/mobius.tex, Theorem C"
+      lean: "OAI.EuclideanRamsey.Mobius.ramsey_iff_ramsey_mobius_full"
+      module: "MobiusRamsey.Theorem"
+      status: "proved"
+      note: "Unit sphere and phi_L, L in O(1,d); arbitrary spheres by a similarity (hand)."
+    - source: "note/mobius.tex, Corollary 1(c)"
+      lean: "OAI.EuclideanRamsey.Mobius.ramsey_mobius_of_algebraic"
+      module: "MobiusRamsey.Corollaries"
+      status: "proved (unit-sphere form)"
+      note: "The note's statement for an arbitrary sphere and for regular polygons follows by hand."
+    - source: "note/mobius.tex, Corollary 1(d)"
+      lean: "OAI.EuclideanRamsey.Mobius.ramsey_circ_mul_rat, OAI.EuclideanRamsey.Mobius.ramsey_circ_add_rat"
+      module: "MobiusRamsey.Corollaries"
+      status: "proved"
+      note: "Rational t_i; ramsey_circ_mul and ramsey_circ_add allow algebraic t_i."
+
+acknowledgements: >-
+  OpenAI (the classification of finite Euclidean Ramsey configurations and its
+  Lean proof); Dömötör Pálvölgyi (the non-Ramsey heptagon); JD-Jones-ASES,
+  Rogerhu12 and atimics (prior work on algebraic coordinates); Mathlib; the Lean
+  Comparator, NanoDa and con-ron kernels as bundled with the Lean toolchain;
+  the PalomarTemplate scripts.

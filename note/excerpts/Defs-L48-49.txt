@@ -1,0 +1,2 @@
+def circ (t : ℝ) : Space 2 :=
+  WithLp.toLp 2 ![(1 - t ^ 2) / (1 + t ^ 2), 2 * t / (1 + t ^ 2)]

@@ -1,0 +1,48 @@
+{
+  "upload_type": "software",
+  "title": "mobius-ramsey: Möbius invariance of the Ramsey property for finite spherical sets (Lean 4)",
+  "version": "1.0.0",
+  "creators": [
+    {
+      "name": "Strinz, Will"
+    }
+  ],
+  "license": "MIT",
+  "description": "<p>A Lean 4 proof, with an accompanying note, that the Euclidean Ramsey property of a finite set of points on a sphere is invariant under Möbius transformations of the sphere (Theorem C), together with corollaries: Möbius images of finite spherical sets with algebraic coordinates are Ramsey, and so are the circle families circ(k t_i) and circ(t_i + c) for distinct rationals t_i and arbitrary reals k != 0 and c. The proof builds on OpenAI's Lean proof of the classification of finite Euclidean Ramsey configurations (openai/math, result 172), and trusts it.</p><p><strong>Verification.</strong> Every theorem depends only on the axioms propext, Classical.choice and Quot.sound; the toolchain's lake comparator (Lean v4.35.0-rc2) accepts the proofs against a Mathlib-only statement file with the Lean, NanoDa and con-ron kernels, and refuses five negative controls. Not formalized: the classical identification of the Lorentz-group maps with the Möbius group, and the reduction from an arbitrary sphere to the unit sphere.</p><p><strong>AI disclosure.</strong> The author, Will Strinz, is the only human contributor. The proofs, the Lean port, the checks and the documentation were produced by AI agents (Claude Opus 5.5 and Claude Sonnet 5.5, Anthropic, in Claude Code) under his direction; the theorem first appeared in a conversation with Claude. The author's read of the hand proof is an owner's read, not expert review; no human expert has reviewed this work. See DISCLOSURE.md.</p><p><strong>Licence.</strong> A mixed tree: this project's own files are under the MIT License; the vendored OpenAI Lean files under OAI/ and two PalomarTemplate scripts under scripts/ are under the Apache License 2.0. NOTICE lists which file is under which licence.</p>",
+  "keywords": [
+    "Euclidean Ramsey theory",
+    "Möbius transformations",
+    "Lorentz group",
+    "spherical configurations",
+    "Lean 4",
+    "formal verification",
+    "Mathlib"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/openai/math/tree/fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb",
+      "relation": "isDerivedFrom",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "arXiv:2609.23327",
+      "relation": "references",
+      "resource_type": "publication-preprint"
+    },
+    {
+      "identifier": "https://github.com/JD-Jones-ASES/six-concyclic-lean/tree/0703d7d",
+      "relation": "references",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://github.com/Rogerhu12/openai-math-extensions/tree/f8a2bb2",
+      "relation": "references",
+      "resource_type": "software"
+    },
+    {
+      "identifier": "https://github.com/atimics/math2/tree/8ab51fa",
+      "relation": "references",
+      "resource_type": "software"
+    }
+  ]
+}

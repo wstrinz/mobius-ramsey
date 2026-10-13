@@ -1,0 +1,76 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "mobius-ramsey: Möbius invariance of the Ramsey property for finite spherical sets (Lean 4)"
+version: "1.0.0"
+authors:
+  - family-names: "Strinz"
+    given-names: "Will"
+license: MIT
+repository-code: "https://github.com/wstrinz/mobius-ramsey"
+abstract: >-
+  A Lean 4 proof, with an accompanying note, that the Euclidean Ramsey property of a
+  finite set of points on a sphere is invariant under Möbius transformations of the
+  sphere (Theorem C), together with corollaries: Möbius images of finite spherical
+  sets with algebraic coordinates are Ramsey, and so are the circle families circ(k
+  t_i) and circ(t_i + c) for distinct rationals t_i and arbitrary reals k != 0 and
+  c. The proof builds on OpenAI's Lean proof of the classification of finite
+  Euclidean Ramsey configurations (openai/math, result 172), and trusts it.
+  Verification. Every theorem depends only on the axioms propext, Classical.choice
+  and Quot.sound; the toolchain's lake comparator (Lean v4.35.0-rc2) accepts the
+  proofs against a Mathlib-only statement file with the Lean, NanoDa and con-ron
+  kernels, and refuses five negative controls. Not formalized: the classical
+  identification of the Lorentz-group maps with the Möbius group, and the reduction
+  from an arbitrary sphere to the unit sphere. AI disclosure. The author, Will
+  Strinz, is the only human contributor. The proofs, the Lean port, the checks and
+  the documentation were produced by AI agents (Claude Opus 5.5 and Claude Sonnet
+  5.5, Anthropic, in Claude Code) under his direction; the theorem first appeared in
+  a conversation with Claude. The author's read of the hand proof is an owner's
+  read, not expert review; no human expert has reviewed this work. See
+  DISCLOSURE.md.
+  Licence. A mixed tree: this project's own files are under the MIT License; the
+  vendored OpenAI Lean files under OAI/ and two PalomarTemplate scripts under
+  scripts/ are under the Apache License 2.0. NOTICE lists which file is under
+  which licence.
+keywords:
+  - Euclidean Ramsey theory
+  - Möbius transformations
+  - Lorentz group
+  - spherical configurations
+  - Lean 4
+  - formal verification
+  - Mathlib
+references:
+  - type: software
+    title: "openai/math: A classification of finite Euclidean Ramsey configurations (result 172), preprint and Lean proof"
+    authors:
+      - name: "OpenAI"
+    repository-code: "https://github.com/openai/math"
+    commit: "fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb"
+    license: Apache-2.0
+  - type: article
+    title: "A cyclic non-Ramsey heptagon"
+    authors:
+      - family-names: "Pálvölgyi"
+        given-names: "Dömötör"
+    identifiers:
+      - type: other
+        value: "arXiv:2609.23327"
+  - type: software
+    title: "six-concyclic-lean"
+    authors:
+      - name: "JD-Jones-ASES"
+    repository-code: "https://github.com/JD-Jones-ASES/six-concyclic-lean"
+    commit: "0703d7d"
+  - type: software
+    title: "openai-math-extensions"
+    authors:
+      - name: "Rogerhu12"
+    repository-code: "https://github.com/Rogerhu12/openai-math-extensions"
+    commit: "f8a2bb2"
+  - type: software
+    title: "math2"
+    authors:
+      - name: "atimics"
+    repository-code: "https://github.com/atimics/math2"
+    commit: "8ab51fa"

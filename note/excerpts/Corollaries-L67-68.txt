@@ -1,0 +1,2 @@
+theorem ramsey_circ_mul_rat {s : ℕ} (t : Fin s → ℚ) (ht : Function.Injective t) (k : ℝ)
+    (hk : k ≠ 0) : Ramsey (fun i => circ (k * (t i : ℝ))) :=

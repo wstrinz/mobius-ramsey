@@ -1,0 +1,61 @@
+name: Verify
+
+# Fresh-runner check: Palomar's source rules, the build with its axioms report, the toolchain's
+# `lake comparator` in its bubblewrap sandbox (scripts/verify-comparator.sh, PalomarTemplate,
+# unmodified), and the negative controls (each must be refused).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Build, Comparator, controls
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+
+      - name: Check Lean source requirements before builds
+        run: python3 scripts/check-lean-sources.py
+
+      - name: Install the toolchain and fetch the Mathlib cache
+        uses: leanprover/lean-action@38fbc41a8c28c4cbaec22d7f7de508ec2e7c0dd9
+        with:
+          build: false
+
+      - name: Build; report axioms; sorry only in the Challenge
+        run: |
+          set -o pipefail
+          lake build 2>&1 | tee "$RUNNER_TEMP/build.log"
+          grep "depends on axioms" "$RUNNER_TEMP/build.log"
+          if grep "depends on axioms" "$RUNNER_TEMP/build.log" | grep -v "\[propext, Classical.choice, Quot.sound\]"; then
+            echo "a theorem uses a non-standard axiom"; exit 1
+          fi
+          if grep "declaration uses" "$RUNNER_TEMP/build.log" | grep -v "Challenge.lean"; then
+            echo "sorry outside Challenge.lean"; exit 1
+          fi
+
+      - name: Install bubblewrap for lake comparator's sandbox
+        # Ubuntu 24.04 restricts unprivileged user namespaces through AppArmor,
+        # which `bwrap` needs for the sandbox; the runner is disposable.
+        run: |
+          sudo apt-get update -qq >/dev/null
+          sudo apt-get install -y -qq bubblewrap >/dev/null
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Run the toolchain's lake comparator (Lean, NanoDa, con-ron)
+        run: ./scripts/verify-comparator.sh
+
+      - name: Negative controls (each must be refused for its stated reason)
+        run: bash tests/controls/run-controls.sh

@@ -1,0 +1,503 @@
+% Note accompanying the mobius-ramsey repository (Lean package in the repository root).
+% Engine: LuaLaTeX or XeLaTeX (the Lean statements are input verbatim, in Unicode).
+% The quotations and Lean excerpts are checked by note/check_verbatim.py (see REPRODUCE.md).
+
+\documentclass[11pt]{amsart}
+\usepackage{iftex}
+\ifPDFTeX
+  \errmessage{Compile with lualatex or xelatex: the Lean statements are Unicode}
+\fi
+\usepackage{fontspec}
+% JuliaMono covers every glyph in the Lean excerpts (R, N, ^T, _v, arrows, top, circ);
+% check glyph coverage at first build if another mono font is substituted.
+\IfFontExistsTF{JuliaMono}{\setmonofont{JuliaMono}[Scale=MatchLowercase]}
+  {\setmonofont{DejaVu Sans Mono}[Scale=MatchLowercase]}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathrsfs}
+\usepackage{booktabs}
+\usepackage{verbatim}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+
+\newcommand{\TODO}[1]{\textcolor{red}{[TODO: #1]}}
+\newcommand{\PH}[1]{\textcolor{blue}{[#1]}}
+\newcommand{\st}[1]{\textsf{[#1]}}
+\newcommand{\Kriz}{K\v{r}\'{\i}\v{z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\DeclareMathOperator{\Sym}{Sym}
+\DeclareMathOperator{\PO}{PO}
+\DeclareMathOperator{\Ort}{O}
+\DeclareMathOperator{\PGL}{PGL}
+\DeclareMathOperator{\Mob}{M\ddot{o}b}
+\DeclareMathOperator{\aff}{aff}
+\DeclareMathOperator{\Mat}{Mat}
+\newcommand{\circmap}{\mathrm{circ}}
+
+% Lean names (the switch changes the theorem name for Theorem C).
+\newcommand{\LeanThmCFullName}{\texttt{OAI.EuclideanRamsey.Mobius.ramsey\_iff\_ramsey\_mobius\_full}}
+\newcommand{\LeanCorName}{\texttt{ramsey\_mobius\_of\_algebraic}}
+\newcommand{\LeanCorCircName}{\texttt{ramsey\_circ\_mul\_rat}, \texttt{ramsey\_circ\_add\_rat}}
+
+\theoremstyle{plain}
+\newtheorem*{theoremC}{Theorem C}
+\newtheorem{corollary}{Corollary}
+\newtheorem*{oaithm}{Theorem 1.1}
+\newtheorem*{oaiprop}{Proposition 2.1}
+\theoremstyle{definition}
+\newtheorem{remark}{Remark}
+
+\title{Ramsey-ness of finite spherical sets is M\"obius invariant}
+\author{Will Strinz}
+\date{October 2026. Archived on Zenodo; the DOI is listed in the repository README.}
+
+\begin{document}
+
+\begin{abstract}
+OpenAI's classification of finite Euclidean Ramsey configurations \cite{OAI172} decides whether
+a finite spherical set is Ramsey by a tensor condition over its coordinate field. We note that
+this condition is transported by the Lorentz group: whether a finite subset of a sphere is
+Ramsey is invariant under M\"obius transformations of the sphere. On a circle, it therefore
+depends only on cross-ratios. Consequences: every M\"obius image of a finite spherical set
+with algebraic coordinates is Ramsey; so is every M\"obius image of a regular polygon; and so
+are the families $\{\circmap(kt_j)\}$ and $\{\circmap(t_j+c)\}$ in the stereographic
+parameter, for distinct rationals $t_j$ and every real $k\ne0$ and $c$, transcendental or not.
+The result is a corollary of \cite{OAI172}, and the deep work is OpenAI's.
+For the unit sphere, with M\"obius transformations given by Lorentz matrices, the invariance
+theorem is proved in Lean~4 on top of OpenAI's formalization, and so are the corollaries for
+algebraic coordinates and for the two circle families; the proofs are checked against a
+Mathlib-only statement of the theorems by Comparator with three independent kernels. The
+passage to an arbitrary sphere, the regular-polygon case and the identification of the Lorentz
+model with the M\"obius group are not formalized: the first two are proved by hand, and the
+identification is cited.
+\end{abstract}
+
+\maketitle
+
+\noindent\textbf{Status conventions.} Each statement carries one tag.
+\st{LEAN}: proved in Lean~4 (v4.35.0-rc2, Mathlib \texttt{065356127b}) on top of OpenAI's Lean
+proof of \cite{OAI172} (ported to the Lean module system by header-only changes), with
+\texttt{\#print axioms} reporting only \texttt{propext}, \texttt{Classical.choice},
+\texttt{Quot.sound}.
+\st{HAND}: a complete written argument, not machine-checked. The Comparator \cite{Comparator}
+check of each \st{LEAN} item is reported in \S\ref{sec:lean}. Each statement
+also names the type of its coordinates over $\Q$ (\texttt{ANY}, \texttt{ALGEBRAIC},
+\texttt{MOBIUS\_ORBIT\_OF(ALGEBRAIC)}). ``Real'' alone is never a scope, because Ramsey-ness can
+differ between algebraic and transcendental members of one real family
+\cite[Prop.~7.6]{OAI172}.
+
+\section{The classification}\label{sec:oai}
+
+A finite set $X$ in a Euclidean space is \emph{Ramsey} if for every $r\ge2$ there is $D$ such that
+every $r$-colouring of $\R^D$ is constant on some congruent copy of $X$
+\cite{EGMRSS,OAI172}. Ramsey sets are spherical \cite{EGMRSS}. Graham's conjecture, that every
+spherical set is Ramsey, was refuted by P\'alv\"olgyi \cite{Palvolgyi}. OpenAI \cite{OAI172}
+then classified the finite Ramsey configurations. We quote the two statements we use verbatim
+from the \TeX{} source at commit \texttt{fd4aeeb2} (Apache-2.0). The only edits are cross-reference
+labels, which we print as OpenAI's rendered numbers. From \cite[\S1.1]{OAI172}:
+
+{\small
+\begin{quote}
+A singleton is Ramsey. For any other set, let $d\ge1$ be its affine
+dimension, and choose a congruent representative
+$A=\{a_1,\ldots,a_s\}\subset\R^d$ whose affine span is $\R^d$.
+The points are distinct and $s\ge2$. Define
+\[
+ p_i=\begin{pmatrix}1\\a_i\end{pmatrix},\qquad
+ F=\Q\bigl((a_i)_\alpha:1\le i\le s,\ 1\le\alpha\le d\bigr),
+ \qquad B=F\otimes_{\Q}F.
+\]
+The commutative ring $B$ has a multiplication homomorphism
+\[
+ m_F:B\longrightarrow F,\qquad m_F(x\otimes y)=xy.
+\]
+An equality in $B$ is stronger than the equality obtained by applying
+$m_F$; this map need not be injective. Index the entries of $p_i$ and
+the rows and columns of a $(d+1)$-by-$(d+1)$ matrix by $0,1,\ldots,d$.
+Thus index $0$ is the constant coordinate.
+
+\begin{oaithm}[Classification]
+Let $A=\{a_1,\ldots,a_s\}\subset\R^d$ be a finite set of at least two
+points with affine span $\R^d$, and define $p_i,F,B,m_F$ as above.
+Then $A$ is Ramsey if and only if there is a matrix
+$P\in\operatorname{Mat}_{d+1}(B)$ such that
+\begin{align}
+ (p_i\otimes1)^T P(1\otimes p_i)&=0
+       &&(1\le i\le s),\tag{1}\\
+ m_F(P_{\alpha\beta})&=\delta_{\alpha\beta}
+       &&(1\le\alpha,\beta\le d).\tag{2}
+\end{align}
+Here the entries of $p_i\otimes1$ and $1\otimes p_i$ are formed
+componentwise. There are no separate conditions on the multiplied
+constant row or constant column of $P$.
+\end{oaithm}
+\end{quote}
+}
+
+\noindent From \cite[\S2]{OAI172}:
+
+{\small
+\begin{quote}
+Throughout, $s\geq2$, $d\geq1$, and
+$A=\{a_1,\ldots,a_s\}$ affinely spans $\R^d$; the field $F$, ring $B$,
+columns $p_i$, and multiplication map $m_F$ are as in the theorem.
+
+Put $W=\R\times\R^d$, regarded as a vector space over $\Q$.
+An element $w=(v,u)$ specifies the affine function $a\mapsto v+a\cdot u$.
+For each label define the $\Q$-linear evaluation map
+\[
+ e_i:W\longrightarrow\R,\qquad e_i(v,u)=v+a_i\cdot u.
+\]
+Let $\mathcal T(W)$ be the subspace of $W\otimes_{\Q}W$ fixed by the
+flip $w\otimes w'\mapsto w'\otimes w$.  Thus our symmetric tensors are
+flip-invariant tensors.  The map
+\[
+ (v,u)\otimes(v',u')\longmapsto u(u')^{\mathsf T}
+\]
+is $\Q$-linear on the tensor product and restricts to a map
+$G:\mathcal T(W)\to\Sym_d(\R)$, where $\Sym_d(\R)$ denotes the real
+symmetric matrices.  In particular, $G(w\otimes w)=uu^{\mathsf T}$.
+The tensor condition is the existence of $T\in\mathcal T(W)$ such that
+\begin{equation}
+ (e_i\otimes e_i)(T)=0\quad(1\leq i\leq s),
+ \qquad G(T)=I_d.\tag{3}
+\end{equation}
+The first identities hold in $\R\otimes_{\Q}\R$.
+They are stronger than their images under real multiplication.
+
+\begin{oaiprop}
+The matrix condition in Theorem~1.1 is equivalent
+to~(3).
+\end{oaiprop}
+\end{quote}
+}
+
+\noindent\emph{Array form.} Write $\mathscr B=\R\otimes_\Q\R$, $m:\mathscr B\to\R$ for
+multiplication and $\tau$ for the flip. The proof of Proposition~2.1 identifies
+$W\otimes_\Q W$ with $(d+1)\times(d+1)$ arrays $Q$ over $\mathscr B$. Under this identification
+$(e_i\otimes e_i)(T)$ becomes $(p_i\otimes1)^TQ(1\otimes p_i)$, $G(T)$ becomes the spatial block of
+$m(Q)$, and the flip becomes $Q^*_{\alpha\beta}=\tau(Q_{\beta\alpha})$. Since $m\circ\tau=m$, we
+have $m(Q^*)=m(Q)^T$. That proof also shows that $\tfrac12(Q+Q^*)$ keeps every vanishing
+evaluation and a multiplied spatial block equal to $I_d$. We use (3) in this form, with
+$B\subset\mathscr B$. In OpenAI's Lean proof, the array form is \texttt{RealCriterion}; the
+necessity and descent halves we use are \texttt{ramsey\_realCriterion} and
+\texttt{realCriterion\_fieldCriterion}, and sufficiency is \texttt{fieldCriterion\_ramsey}.
+
+\section{M\"obius invariance}\label{sec:mobius}
+
+Let $S=\mathrm{diag}(-1,1,\dots,1)$ on $\R^{1+d}$, with coordinates indexed $0,1,\dots,d$ as above,
+and let $\Ort(1,d)=\{L\in\Mat_{d+1}(\R):L^TSL=S\}$. For $x$ on the unit sphere
+$S^{d-1}\subset\R^d$, the vector $(1,x)$ is $S$-null. If $L\in\Ort(1,d)$, then $L(1,x)$ is again
+null and nonzero, so its $0$-th coordinate $\lambda$ is nonzero: a null vector with vanishing
+$0$-th coordinate is $0$. Put
+\[
+ L\begin{pmatrix}1\\x\end{pmatrix}=\lambda\begin{pmatrix}1\\\varphi_L(x)\end{pmatrix},
+ \qquad \varphi_L(x)\in S^{d-1}.
+\]
+For $d\ge2$, the maps $\varphi_L$ are the M\"obius transformations of $S^{d-1}$. Here the M\"obius
+group $\Mob(S^{d-1})$ consists of the restrictions to $S^{d-1}$ of the M\"obius transformations of
+$\R^d\cup\{\infty\}$ that preserve $S^{d-1}$. For $d\ge3$ these are exactly the conformal
+diffeomorphisms of $S^{d-1}$ (Liouville). For $d=2$ they are $\PGL_2(\R)$ acting on the
+stereographic parameter. For $d\ge2$, the map $L\mapsto\varphi_L$ induces the classical isomorphism
+$\PO(1,d)=\Ort(1,d)/\{\pm I\}\cong\Mob(S^{d-1})$, orientation-reversing maps included
+\cite[Thm.~3.2.3 and \S3.2, Cor.~3; \S4.4, Cor.~3; Thm.~4.5.2 and \S4.5, Cor.~1]{Ratcliffe},
+\cite[\S3.7, Thms.~3.7.5 and 3.7.6, pp.~49--54]{Beardon}. In Ratcliffe's notation it is the
+composite of Poincar\'e extension $\Mob(S^{d-1})\cong M(B^d)$, restriction $M(B^d)\cong I(B^d)$,
+the isometry of the conformal ball model $B^d$ with $H^d$, and $I(H^d)\cong\Ort^+(d,1)$; his time
+coordinate is the last one. Beardon puts the time coordinate first,
+as here, and acts on row vectors; he gives the isomorphism of $\Ort^+(1,d)$ onto the full M\"obius
+group of $B^d$ by conjugation with his map $F$ from the hyperboloid to the ball.
+We cite this identification. It is not formalized.
+The restriction $d\ge2$ matters: for $d=1$ the sphere $S^0=\{\pm1\}$ has two points, every boost
+in $\Ort(1,1)$ fixes both, and the maps $\varphi_L$ are just the two permutations of $S^0$, so
+$L\mapsto\varphi_L$ is not injective on $\PO(1,1)$. Theorem~C still holds for $d=1$ (every
+subset of $S^0$ is Ramsey: a singleton is, and every two-point set is \cite[Cor.~7.4]{OAI172}),
+and the Lean statement covers it, but there it is not a statement about a M\"obius group. For
+$d=0$ the unit sphere is empty.
+
+\begin{theoremC}
+Let $A$ be a finite subset of a sphere in $\R^d$, and let $\varphi$ be a M\"obius transformation
+of that sphere. Then $A$ is Ramsey if and only if $\varphi(A)$ is Ramsey. In particular, for
+points on a circle, Ramsey-ness depends only on cross-ratios (Corollary~\ref{cor}(a)).
+
+\smallskip\noindent\emph{Status:} \st{LEAN} for $s$ distinct points of the unit sphere and
+$\varphi=\varphi_L$, $L\in\Ort(1,d)$, with no spanning hypothesis. Lean: \LeanThmCFullName{}
+(\S\ref{sec:lean}), accepted by Comparator. The reduction from an arbitrary sphere to the unit
+sphere is a similarity \st{HAND} (Remark~\ref{rem:wlog}), and the identification of
+$\Mob(S^{d-1})$ with $\PO(1,d)$ is cited. Scope: \texttt{ANY}.
+\end{theoremC}
+
+\begin{proof}[Proof of Theorem C for spanning sets]
+Write $A=\{a_i\}$, $A'=\{\varphi_L(a_i)\}$, $p_i=(1,a_i)$ and $p_i'=(1,\varphi_L(a_i))$, so that
+$Lp_i=\mu_ip_i'$ with $\mu_i\in\R^\times$. A singleton is Ramsey, so assume $s\ge2$; then $d\ge1$.
+
+\emph{Step 1: $A'$ is again a configuration of the same kind.} If $x,y\in S^{d-1}$ are distinct,
+then $(1,x)$ and $(1,y)$ span distinct lines, and so do their images under the invertible $L$.
+Hence $\varphi_L(x)\neq\varphi_L(y)$, and the $s$ points of $A'$ are distinct and lie on $S^{d-1}$.
+A finite set affinely spans $\R^d$ if and only if its augmented vectors span $\R^{1+d}$, that is,
+if and only if no nonzero affine function vanishes on it. The vectors $p_i'=\mu_i^{-1}Lp_i$ span
+$\R^{1+d}$ because the $p_i$ do. So $A'$ affinely spans $\R^d$.
+
+\emph{Step 2: a normalized certificate for $A$.} Suppose $A$ is Ramsey. Theorem~1.1 gives $P$ over
+$B\subset\mathscr B$ with (1) and (2). Replace $P$ by $\tfrac12(P+P^*)$. This keeps (1), and
+$m(P)$ becomes symmetric with spatial block $I_d$. Applying $m$ to (1) gives
+$(1,a_i)\,m(P)\,(1,a_i)^T=0$, so the quadratic function $q(x)=(1,x)\,m(P)\,(1,x)^T$ vanishes on $A$.
+It has the form $\|x\|^2+\ell\cdot x+c$. So does $(1,x)S(1,x)^T=\|x\|^2-1$, which also vanishes on
+$A$. Their difference is an affine function vanishing on the spanning set $A$, hence zero. Thus
+$m(P)=S$.
+
+\emph{Step 3: transport.} Let $N=L^{-1}$. Write $N\otimes1$ and $1\otimes N$ for the matrices with
+entries $N_{\alpha\beta}\otimes1$ and $1\otimes N_{\alpha\beta}$ in $\mathscr B$, and put
+\[
+ P'=(N\otimes1)^T\,P\,(1\otimes N).
+\]
+Since $Np_i'=\mu_i^{-1}p_i$, we get
+\[
+ (p_i'\otimes1)^TP'(1\otimes p_i')
+ =(\mu_i^{-1}\otimes\mu_i^{-1})\,(p_i\otimes1)^TP(1\otimes p_i)=0.
+\]
+Multiplication is a ring map, so $m(P')=N^TSN=S$, because $L^TSL=S$ implies $N^TSN=S$. The
+spatial block of $S$ is $I_d$. If $P^*=P$, then $P'^*=P'$, by applying $\tau$ entrywise.
+
+\emph{Step 4: descent and conclusion.} In the array form, $P'$ is a flip-invariant tensor that
+satisfies (3) for $A'$. By Step~1, $A'$ meets the standing hypotheses of \cite[\S2]{OAI172}.
+Proposition~2.1 for $A'$ therefore gives a matrix over $B'=F'\otimes_\Q F'$, where $F'$ is the
+coordinate field of $A'$, satisfying (1) and (2) for $A'$. Theorem~1.1 then shows that $A'$ is
+Ramsey.
+
+The descent step carries the weight. The entries of $L$ in general lie in neither $F$ nor $F'$,
+so the transport has to take place over $\mathscr B$.
+
+\emph{Converse.} $L^{-1}=SL^TS\in\Ort(1,d)$ and $\varphi_{L^{-1}}\circ\varphi_L=\mathrm{id}$ on
+$S^{d-1}$. Since $A'$ spans by Step~1, the same argument applied to $A'$ and $L^{-1}$ shows that
+$A'$ Ramsey implies $A$ Ramsey.
+\end{proof}
+
+The Lean proof follows these steps, with the spanning hypothesis removed as described at the end
+of Remark~\ref{rem:wlog}. The matrix identities of Step~3 are proved over an arbitrary
+commutative ring with two ring maps from $\R$. OpenAI's lemmas named in \S\ref{sec:oai} are
+imported, with their statements and proofs unchanged. The project owner read this proof line by
+line and ratified it. He describes himself as not an expert in the area, so that read is an owner's sign-off, not expert review.
+
+\begin{remark}[The spanning hypothesis]\label{rem:wlog}
+\st{HAND}
+Let $A$ be a finite subset of a sphere $\Sigma_0\subset\R^d$ with $|A|\ge2$, and let $\varphi$ be
+a M\"obius transformation of $\Sigma_0$. Ramsey-ness is invariant under similarities. Congruences
+preserve it by definition. If an $r$-colouring $c$ of $\R^D$ is given, then
+$x\mapsto c(\lambda x)$ is another $r$-colouring, and a monochromatic copy of $X$ for the second
+colouring gives a monochromatic copy of $\lambda X$ for $c$. So we may take $\Sigma_0=S^{d-1}$.
+
+Let $E=\aff(A)$, of dimension $k$, and let $\Sigma=S^{d-1}\cap E$. This is the smallest subsphere
+containing $A$, a $(k-1)$-sphere of positive radius, and $A$ affinely spans $E$. M\"obius maps send
+subspheres to subspheres, so $\Sigma'=\varphi(\Sigma)$ is a $(k-1)$-subsphere, with affine hull
+$E'$. Choose similarities $\sigma:E\to\R^k$ and $\sigma':E'\to\R^k$ that carry $\Sigma$ and
+$\Sigma'$ onto $S^{k-1}$. Then $\psi=\sigma'\circ\varphi\circ\sigma^{-1}$ is a M\"obius
+transformation of $S^{k-1}$. In the Lorentz model, $\varphi=\varphi_L$; $L$ maps the
+$(k+1)$-dimensional subspace $U=\operatorname{span}\{(1,a):a\in\Sigma\}$, on which $S$ has
+signature $(1,k)$, onto $LU$, and in $S$-orthonormal bases of $U$ and $LU$ the induced map lies in
+$\Ort(1,k)$. Theorem~C applies to $\sigma(A)\subset S^{k-1}$ and $\psi$, and both similarities
+preserve Ramsey-ness. If $k=1$, then $|A|=2$, and every two-point set is Ramsey
+\cite[Cor.~7.4]{OAI172}.
+The Lean proof of the span-free statement does not follow this route; nothing
+is restricted to a subsphere. It removes the spanning hypothesis at the level of OpenAI's real
+criterion, in two places. For necessity, OpenAI's \texttt{full\_affine\_representative} gives a
+congruent spanning copy $B\subset\R^k$ of $A$, so that $A=t+Q(B)$ for a linear isometry
+$Q:\R^k\to\R^d$; the criterion for $B$ is transferred to $A$ in $A$'s own coordinates by adding
+rank-one arrays built from the projection onto $Q(\R^k)^\perp$
+(\texttt{realCriterion\_of\_isometry}). For the normalization of Step~2, without spanning the
+symmetrized multiplied matrix is $S+e_0w^T+we_0^T$ for an affine function $w$ vanishing on $A$,
+and subtracting the rank-one arrays $e_0\otimes w+w\otimes e_0$ (zero evaluations) leaves $S$
+(\texttt{exists\_lorentz\_normal}). Step~3 is unchanged, and in Step~4 OpenAI's Lean descent
+(\texttt{realCriterion\_fieldCriterion}) and sufficiency (\texttt{fieldCriterion\_ramsey}) carry
+no spanning hypothesis, so they apply to $A'$ directly.
+\end{remark}
+
+\begin{corollary}\label{cor}
+\begin{enumerate}
+\item[(a)] \st{HAND}, scope \texttt{ANY}. Let $(a_1,\dots,a_s)$ and $(b_1,\dots,b_s)$, $s\ge4$, be
+ordered tuples of distinct points, each tuple lying on a circle in some Euclidean space. Identify
+each circle with the unit circle of $\C$ by a similarity. If the cross-ratios satisfy
+$[a_1,a_2;a_3,a_i]=[b_1,b_2;b_3,b_i]$ for $4\le i\le s$, then $\{a_i\}$ is Ramsey if and only if
+$\{b_i\}$ is. (The cross-ratios of concyclic points are real, so they do not depend on the choice
+of similarity.)
+\item[(b)] \st{HAND}, scope \texttt{ANY}. Every triangle is Ramsey: three distinct points of a
+circle are M\"obius-equivalent to an equilateral triangle, which is Ramsey (it is transitive
+\cite[Cor.~7.2]{OAI172}). This agrees with Frankl and R\"odl \cite{FR86}. It is \emph{not} an
+independent proof, because it rests on \cite{OAI172}, whose Cor.~7.4 already gives it directly.
+\item[(c)] \st{LEAN} for the unit sphere (\LeanCorName, accepted by Comparator;
+the passage to an arbitrary sphere and the polygon case are \st{HAND}),
+scope \texttt{MOBIUS\_ORBIT\_OF(ALGEBRAIC)}. Every M\"obius image of a finite subset of a sphere
+whose coordinates are real algebraic numbers is Ramsey. In particular, every M\"obius image of
+the vertex set of a regular polygon is Ramsey.
+\item[(d)] \st{LEAN} (\LeanCorCircName, accepted by Comparator),
+scope \texttt{MOBIUS\_ORBIT\_OF(ALGEBRAIC)}. Let
+$\circmap(t)=\bigl(\tfrac{1-t^2}{1+t^2},\tfrac{2t}{1+t^2}\bigr)$, the unit circle in the
+stereographic parameter from $(-1,0)$, as in \cite[Prop.~7.6]{OAI172}. Let $t_1,\dots,t_s$ be
+distinct rationals. Then for every real $k\neq0$ the set $\{\circmap(kt_j)\}_j$ is Ramsey, and
+for every real $c$ the set $\{\circmap(t_j+c)\}_j$ is Ramsey.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+(a) After similarities, both tuples lie on the unit circle. The M\"obius transformation $\mu$ of
+$\C\cup\{\infty\}$ with $\mu(a_j)=b_j$ for $j=1,2,3$ maps the circle through $a_1,a_2,a_3$ onto
+the circle through $b_1,b_2,b_3$, so it preserves the unit circle. Since $\mu$ preserves
+cross-ratios, $\mu(a_i)=b_i$ for all $i$. Three distinct concyclic points span the plane, so
+Theorem~C applies in its spanning form, with $\mu|_{S^1}=\varphi_L$.
+
+(b) The case $s=3$ of the argument in (a).
+
+(c) A finite spherical set with real algebraic coordinates is Ramsey (``Theorem~A''; prior work:
+\cite{JDJones,Rogerhu}, and end to end in Lean, for configurations with full affine span,
+\cite{Atimics}; see \S\ref{sec:credit}). This repository proves it again in Lean on OpenAI's
+development (\texttt{ramsey\_of\_algebraic}), with no spanning hypothesis. Apply Theorem~C. The
+Lean form of Theorem~A holds on any sphere; for a sphere other than the unit sphere, Theorem~C
+itself is applied after the similarity reduction of Remark~\ref{rem:wlog}, which is the
+\st{HAND} step. A regular polygon is similar (not in general
+congruent) to $\{e^{2\pi i j/n}\}\subset S^1$, which has algebraic coordinates and spans the plane
+when $n\ge3$; similarities preserve Ramsey-ness (Remark~\ref{rem:wlog}).
+
+(d) In the stereographic parameter, $u\mapsto ku$ for $k\neq0$ and $u\mapsto u+c$ are in
+$\PGL_2(\R)=\Mob(S^1)$; in the Lean proof they are given by explicit matrices in $\Ort(1,2)$
+(\texttt{exists\_mobius\_circ\_mul}, \texttt{exists\_mobius\_circ\_add}). They map the rational
+points $\circmap(t_j)$ to the given sets. Apply (c). The Lean theorems \texttt{ramsey\_circ\_mul}
+and \texttt{ramsey\_circ\_add} allow algebraic $t_j$.
+\end{proof}
+
+For transcendental $k$ or $c$ and $s\ge2$ the sets in (d) have a transcendental coordinate field
+($\Q(k)$ or $\Q(c)$: the parameter $u$ of $\circmap(u)=(x,y)$ is $y/(1+x)$, and some $t_j\ne0$),
+yet they are Ramsey for every number of points. By contrast, nine points
+$\circmap(t_1),\dots,\circmap(t_9)$ with algebraically independent $t_i$ are not Ramsey
+\cite[Prop.~7.6]{OAI172}. So for transcendental coordinates, transcendence alone does not decide
+the question. Here the M\"obius orbit of a
+rational set does.
+
+\section{The Lean statement and its verification}\label{sec:lean}
+
+OpenAI's definitions, used verbatim (\texttt{Model.lean} at \texttt{fd4aeeb2}, Apache-2.0):
+{\small\verbatiminput{excerpts/OAI-Model-L9-17.txt}}
+\noindent Statement definitions (\texttt{MobiusRamsey/Defs.lean}, lines 32--43 and 48--49;
+nine code lines):
+{\small\verbatiminput{excerpts/Defs-L32-43.txt}}
+{\small\verbatiminput{excerpts/Defs-L48-49.txt}}
+
+\noindent Theorem C (\texttt{MobiusRamsey/Theorem.lean}, lines 68--72; proof omitted):
+{\small\verbatiminput{excerpts/Theorem-L68-72.txt}}
+\noindent Corollary~\ref{cor}(c), unit-sphere form, and (d)
+(\texttt{MobiusRamsey/Corollaries.lean}, lines 30--35, 67--68 and 72--73; proofs omitted):
+{\small\verbatiminput{excerpts/Corollaries-L30-35.txt}}
+{\small\verbatiminput{excerpts/Corollaries-L67-68.txt}}
+{\small\verbatiminput{excerpts/Corollaries-L72-73.txt}}
+
+\noindent\emph{Fidelity.} ``M\"obius transformation of $S^{d-1}$'' is modelled as
+\texttt{mobiusMap L} with $L^TSL=S$. The identification with $\Mob(S^{d-1})$ is cited
+(\S\ref{sec:mobius}). Off the sphere, \texttt{mobiusMap} is not meaningful (Lean's $x/0=0$), but
+the theorems evaluate it only on the sphere, where the divisor is proved nonzero. Points are an
+injective family on the unit sphere centred at $0$; a general sphere reduces to it by a
+similarity. In Corollary~\ref{cor}(d) the Lean names match the text: \texttt{t i} is the
+rational $t_i$, and \texttt{k}, \texttt{c} are the real factor and shift.
+
+OpenAI's \texttt{Ramsey} is used unchanged.
+\texttt{\#print axioms} gives \texttt{[propext, Classical.choice, Quot.sound]} for every theorem
+quoted here. The statements need 9 lines of definitions beyond Mathlib and OpenAI. The proof of
+Theorem~C takes 672 lines (\texttt{Defs}, \texttt{Transport}, \texttt{FullTransport},
+\texttt{Theorem}); the corollaries take 367 more (\texttt{Circle}, \texttt{Corollaries}, and
+\texttt{AlgebraicRamsey} for Theorem~A).
+
+\smallskip\noindent\emph{Verification.} The repository is a single Lake package. OpenAI's 28
+files of the import closure of \texttt{Main} are included with their statements and proofs
+unchanged; to meet the Lean module system they were ported by header-only changes, listed in
+\texttt{docs/PORT-LOG.md}. \texttt{Challenge.lean} restates the definitions above and the four
+theorem statements using Mathlib alone. The toolchain's \texttt{lake comparator} \cite{Comparator}
+checks that the proved theorems have exactly these statements and definitions and only the three
+standard axioms, and replays the proofs through three kernels (Lean's, NanoDa and con-ron). It
+accepts. Five altered challenges (negative controls) are refused for the expected reasons: the
+challenge used as its own solution (\texttt{sorryAx}), \texttt{Ramsey} with $3\le r$,
+\texttt{lorentzForm} replaced by the identity, a changed \texttt{circ}, and Theorem~C without
+injectivity. The last is a stronger statement, probably true; it is refused because it is not the
+statement that was proved. The proofs trust
+OpenAI's Lean proof of \cite{OAI172}. Repository: \url{https://github.com/wstrinz/mobius-ramsey}; archived on Zenodo (DOI in the repository README); replay: \texttt{REPRODUCE.md} in the repository.
+
+\section{Credit}\label{sec:credit}
+
+\begin{itemize}
+\item \textbf{OpenAI \cite{OAI172}} is the foundation: Theorem~1.1, Proposition~2.1, and the Lean
+proof on which ours builds. Theorem~C is a short consequence of that work.
+\item \textbf{P\'alv\"olgyi \cite{Palvolgyi}} gave the seven-point non-Ramsey heptagon. By the
+arXiv comments and the disclosure in the paper itself, the whole manuscript was written by
+ChatGPT, and its appendix, which he labels as unchecked, consists of further results by ChatGPT
+that he has not verified. The appendix proves in Lemma~A.5 that the
+\emph{existence of his derivation certificates} is invariant under real M\"obius maps. It states
+explicitly that the lemma ``does not assert that the Ramsey property itself is M\"obius
+invariant.'' Theorem~C is that stronger assertion, obtained from \cite{OAI172}. The appendix's
+Theorem~A.10 is the certificate-level analogue, on the circle, of Corollary~\ref{cor}(c): a
+finite subset of the unit circle that a M\"obius transformation sends to points with algebraic
+coordinates, apart from at most three, admits no certificate of his (non-Ramsey) derivation
+criterion. The appendix notes that this is a limitation of the certificate method and does not
+decide Ramsey-ness.
+\item \textbf{JD-Jones-ASES/six-concyclic-lean} \cite{JDJones} (commit \texttt{0703d7d},
+2026-10-07) and \textbf{Rogerhu12/openai-math-extensions} \cite{Rogerhu} (commit
+\texttt{f8a2bb2}, 2026-10-07) observed that algebraic coordinates satisfy OpenAI's criterion:
+JD-Jones in Lean, at criterion level, with the Ramsey conclusion conditional on a hypothesis
+\texttt{hsuff}; Rogerhu12 in \TeX. \textbf{atimics/math2} \cite{Atimics} (commit \texttt{8ab51fa},
+2026-10-08) proved Theorem~A end to end in Lean on OpenAI's proof, for algebraic configurations
+with full affine span (its Lean statement carries a spanning hypothesis); its written derivation
+extends this to sets similar to algebraic ones. Corollary~\ref{cor}(c) rests on Theorem~A; this
+repository's \texttt{ramsey\_of\_algebraic} is a further Lean proof of it, not a first one.
+\item Literature and repository searches found no prior statement of Theorem~C; the search log
+is \texttt{docs/PRIOR-WORK-SEARCH.md} in the repository. Leader--Russell--Walters \cite{LRW12}
+contains no M\"obius or cross-ratio remark. \Kriz{} \cite{Kriz91,Kriz92} has not yet been checked
+\TODO{final search before release: the remaining openai/math follow-up repositories,
+\Kriz{} 1991/1992, MathOverflow, the Palomar registry}. The corollaries in
+Corollary~\ref{cor} are derivable by an expert from Theorem~C and known results, and are not
+claimed as independently new.
+\end{itemize}
+
+\section{AI use and review disclosure}\label{sec:disclosure}
+
+The author is the only human contributor; \texttt{DISCLOSURE.md} in the repository gives the
+details. Theorem~C and its proof came out of a conversation with Claude Opus~5.5 (Anthropic,
+in claude.ai). Claude Opus~5.5 then coordinated the work, wrote the Lean
+proofs, checked the hand proof step by step, and condensed this note from a longer draft; Claude
+Sonnet~5.5 carried out the literature searches and other named checks. All reviews of this work
+other than the author's read are AI reviews. The author read the hand proof of Theorem~C line by
+line; he is not an expert in the area, so that read is an owner's sign-off, not expert review.
+\textbf{No human expert has reviewed this note.} Machine checks: Lean and Comparator, for
+Theorem~C and for the Lean forms of Corollary~\ref{cor}(c), (d) (\S\ref{sec:lean}).
+
+\begin{thebibliography}{99}
+\bibitem{OAI172} OpenAI, \emph{A classification of finite Euclidean Ramsey configurations},
+OpenAI Math Release preprint, September 23, 2026; github.com/openai/math, commit
+\texttt{fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb}, \texttt{preprints/A-classification-of-finite-Euclidean-Ramsey-configurations-September-23-2026/}.
+\bibitem{Palvolgyi} D.~P\'alv\"olgyi, \emph{A cyclic non-Ramsey heptagon}, arXiv:2609.23327 (v1,
+2026-09-20). \TODO{re-check for a v2 on posting day.}
+\bibitem{JDJones} JD-Jones-ASES, \emph{six-concyclic-lean}, GitHub repository,
+\url{https://github.com/JD-Jones-ASES/six-concyclic-lean}, root commit \texttt{0703d7d}, 2026-10-07.
+\bibitem{Atimics} atimics, \emph{math2}, GitHub repository, \url{https://github.com/atimics/math2},
+\texttt{EndToEnd/AlgebraicRamsey.lean}, commit \texttt{8ab51fa}, 2026-10-08.
+\bibitem{Rogerhu} Rogerhu12, \emph{openai-math-extensions},
+\texttt{papers/172-euclidean-ramsey/algebraic\_spherical\_configurations.tex}, commit
+\texttt{f8a2bb2}, 2026-10-07, \url{https://github.com/Rogerhu12/openai-math-extensions}.
+\bibitem{EGMRSS} P.~Erd\H{o}s, R.~L.~Graham, P.~Montgomery, B.~L.~Rothschild, J.~Spencer,
+E.~G.~Straus, \emph{Euclidean Ramsey theorems I}, J. Combin. Theory Ser. A \textbf{14} (1973),
+no.~3, 341--363. doi:10.1016/0097-3165(73)90011-3.
+\bibitem{FR86} P.~Frankl, V.~R\"odl, \emph{All triangles are Ramsey}, Trans. Amer. Math. Soc.
+\textbf{297} (1986), no.~2, 777--779. doi:10.1090/S0002-9947-1986-0854099-6.
+\bibitem{Kriz91} I.~\Kriz, \emph{Permutation groups in Euclidean Ramsey theory}, Proc. Amer.
+Math. Soc. \textbf{112} (1991), no.~3, 899--907. doi:10.1090/S0002-9939-1991-1065087-9.
+\bibitem{Kriz92} I.~\Kriz, \emph{All trapezoids are Ramsey}, Discrete Math. \textbf{108} (1992),
+59--62. doi:10.1016/0012-365X(92)90660-8.
+\bibitem{LRW12} I.~Leader, P.~A.~Russell, M.~Walters, \emph{Transitive sets in Euclidean Ramsey
+theory}, J. Combin. Theory Ser. A \textbf{119} (2012), no.~2, 382--396.
+doi:10.1016/j.jcta.2011.09.005.
+\bibitem{Ratcliffe} J.~G.~Ratcliffe, \emph{Foundations of Hyperbolic Manifolds}, 3rd ed.,
+Graduate Texts in Mathematics \textbf{149}, Springer, Cham, 2019. doi:10.1007/978-3-030-31597-9.
+\bibitem{Beardon} A.~F.~Beardon, \emph{The Geometry of Discrete Groups}, Graduate Texts in
+Mathematics \textbf{91}, Springer, New York, 1983. doi:10.1007/978-1-4612-1146-4.
+\bibitem{Comparator} leanprover/comparator, as bundled in the Lean toolchain
+\texttt{leanprover/lean4:v4.35.0-rc2} (\texttt{lake comparator}, with the NanoDa and con-ron
+kernels).
+\end{thebibliography}
+
+\end{document}

@@ -1,0 +1,6 @@
+theorem ramsey_mobius_of_algebraic {s d : ℕ} (a : Fin s → Space d)
+    (L : Matrix (Option (Fin d)) (Option (Fin d)) ℝ)
+    (hL : Lᵀ * lorentzForm d * L = lorentzForm d) (ha : Function.Injective a)
+    (hsph : ∀ i, a i ∈ Metric.sphere (0 : Space d) 1)
+    (halg : ∀ i j, IsAlgebraic ℚ (a i j)) :
+    Ramsey (mobiusMap L ∘ a) := by

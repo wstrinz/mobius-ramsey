@@ -1,0 +1,12 @@
+def lorentzForm (d : ℕ) : Matrix (Option (Fin d)) (Option (Fin d)) ℝ :=
+  Matrix.diagonal fun α => Option.elim α (-1) fun _ => 1
+
+/-- The augmented vector `(1, x)`, as OAI's `realAugmented`. -/
+def aug (x : Space d) : Option (Fin d) → ℝ
+  | none => 1
+  | some j => x j
+
+/-- The point map of `L ∈ O(1,d)` on the unit sphere: the spatial part of `L (1, x)` divided by
+its `none` coordinate (nonzero on the sphere, `time_ne_zero`). -/
+def mobiusMap (L : Matrix (Option (Fin d)) (Option (Fin d)) ℝ) (x : Space d) : Space d :=
+  WithLp.toLp 2 fun j => (L *ᵥ aug x) (some j) / (L *ᵥ aug x) none

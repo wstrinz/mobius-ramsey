@@ -1,0 +1,12 @@
+{
+  "challenge_module": "Challenge",
+  "solution_module": "Challenge",
+  "theorem_names": [
+    "OAI.EuclideanRamsey.Mobius.ramsey_iff_ramsey_mobius_full",
+    "OAI.EuclideanRamsey.Mobius.ramsey_mobius_of_algebraic",
+    "OAI.EuclideanRamsey.Mobius.ramsey_circ_mul_rat",
+    "OAI.EuclideanRamsey.Mobius.ramsey_circ_add_rat"
+  ],
+  "definition_names": [],
+  "permitted_axioms": ["propext", "Quot.sound", "Classical.choice"]
+}
