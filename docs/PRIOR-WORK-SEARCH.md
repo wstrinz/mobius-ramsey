@@ -51,17 +51,40 @@ agent through the GitHub API. The search must be repeated immediately before rel
   1012.5468) and Graham's 1994 survey and Handbook chapter 11, which contain no Möbius, inversion,
   projective or cross-ratio remark.
 
+## Posting-grade re-run (2026-10-13, 02:09–03:05 UTC)
+
+Delta since the previous round. **No prior statement of Theorem C found.**
+- **arXiv:** 33 queries on submitted and last-updated dates for 2026-10-12..13, plus 2026-09-20..10-13;
+  full-text checks of 12 Euclidean-Ramsey-adjacent PDFs. Only known items. *Caveat:* the arXiv API
+  index showed nothing submitted after 2026-10-09 ~18:00Z (announcement lag).
+- **arXiv:2609.23327:** v1 only (v2 returns 404). Its Comments field states that the manuscript was
+  written entirely by ChatGPT.
+- **openai/math:** HEAD `1581d4cb`. The two commits after `fd4aeeb2` only add a PR-lock workflow. Forks
+  pushed since 2026-10-12 carry no unique content.
+- **GitHub:** repository, README and code searches for repos created or pushed since 2026-10-12 found no
+  third-party match. JD-Jones-ASES/six-concyclic-lean, atimics/math2 and Rogerhu12/openai-math-extensions
+  have no new Möbius-related commits.
+- **Palomar:** 527 entries (revision 252) plus the feed; no Euclidean-Ramsey or Möbius entry beyond
+  JD-Jones's v1.
+- **MathOverflow and math.stackexchange** (Stack Exchange API, 2026): nothing relevant.
+- **OpenAlex, Semantic Scholar, HAL:** nothing relevant.
+- **New nearest framing:** Gibbons–Luo, arXiv:1307.5351 (2013), proposes "inversive Ramsey theory"
+  (the Möbius group replacing the Euclidean group). It does not state Theorem C. It is cited in the note.
+- **Kříž 1991** (Proc. AMS 112, 899–907) was **read in full** (AMS free back issue). It contains no
+  Möbius, inversion, conformal, cross-ratio, projective or stereographic content.
+
 ## Not read
 
-- Kříž, *Permutation groups in Euclidean Ramsey theory* (Proc. AMS 1991) and *All trapezoids are
-  Ramsey* (Discrete Math. 1992): blocked by the publisher; library access is needed.
+- Kříž, *All trapezoids are Ramsey* (Discrete Math. 1992): the publisher site serves a challenge
+  page; library access is needed. A Möbius remark there is a priori unlikely.
 - About 50 of the GitHub follow-up repositories of the OpenAI release were not enumerated
   individually in the second round (the third round's code scan covered 145).
-- Lean Zulip, ResearchGate, Google Scholar and HAL were not searched.
+- Lean Zulip, ResearchGate and Google Scholar were not searched (HAL was, in the re-run).
 
 ## Still to do (immediately before release)
 
 - Re-run the arXiv queries and the GitHub enumeration; check openai/math HEAD and the Palomar
   registry feed.
-- Check arXiv:2609.23327 for a v2.
-- Read Kříž 1991 and 1992.
+- Check arXiv:2609.23327 for a v2. (Done 2026-10-13: v1 only.)
+- Read Kříž 1991 (done 2026-10-13) and 1992 (still unread).
+- Because of the arXiv index lag, repeat the arXiv queries at the moment of release.

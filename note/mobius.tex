@@ -447,9 +447,10 @@ extends this to sets similar to algebraic ones. Corollary~\ref{cor}(c) rests on 
 repository's \texttt{ramsey\_of\_algebraic} is a further Lean proof of it, not a first one.
 \item Literature and repository searches found no prior statement of Theorem~C; the search log
 is \texttt{docs/PRIOR-WORK-SEARCH.md} in the repository. Leader--Russell--Walters \cite{LRW12}
-contains no M\"obius or cross-ratio remark. \Kriz{} \cite{Kriz91,Kriz92} has not yet been checked
-\TODO{final search before release: the remaining openai/math follow-up repositories,
-\Kriz{} 1991/1992, MathOverflow, the Palomar registry}. The corollaries in
+contains no M\"obius or cross-ratio remark, and neither does \Kriz{} \cite{Kriz91}; we could not
+obtain \cite{Kriz92}. Gibbons and Luo \cite{GibbonsLuo} proposed an ``inversive Ramsey theory'',
+with the M\"obius group in place of the Euclidean group, but do not relate the Euclidean Ramsey
+property to M\"obius images. The searches were last repeated on 2026-10-13. The corollaries in
 Corollary~\ref{cor} are derivable by an expert from Theorem~C and known results, and are not
 claimed as independently new.
 \end{itemize}
@@ -471,7 +472,7 @@ Theorem~C and for the Lean forms of Corollary~\ref{cor}(c), (d) (\S\ref{sec:lean
 OpenAI Math Release preprint, September 23, 2026; github.com/openai/math, commit
 \texttt{fd4aeeb2ee4fc729c18d98444fed42fd0529eeeb}, \texttt{preprints/A-classification-of-finite-Euclidean-Ramsey-configurations-September-23-2026/}.
 \bibitem{Palvolgyi} D.~P\'alv\"olgyi, \emph{A cyclic non-Ramsey heptagon}, arXiv:2609.23327 (v1,
-2026-09-20). \TODO{re-check for a v2 on posting day.}
+2026-09-20; no later version as of 2026-10-13).
 \bibitem{JDJones} JD-Jones-ASES, \emph{six-concyclic-lean}, GitHub repository,
 \url{https://github.com/JD-Jones-ASES/six-concyclic-lean}, root commit \texttt{0703d7d}, 2026-10-07.
 \bibitem{Atimics} atimics, \emph{math2}, GitHub repository, \url{https://github.com/atimics/math2},
@@ -488,6 +489,8 @@ no.~3, 341--363. doi:10.1016/0097-3165(73)90011-3.
 Math. Soc. \textbf{112} (1991), no.~3, 899--907. doi:10.1090/S0002-9939-1991-1065087-9.
 \bibitem{Kriz92} I.~\Kriz, \emph{All trapezoids are Ramsey}, Discrete Math. \textbf{108} (1992),
 59--62. doi:10.1016/0012-365X(92)90660-8.
+\bibitem{GibbonsLuo} J.~C.~Gibbons, Y.~Luo, \emph{Colorings of the $n$-sphere and inversive geometry},
+arXiv:1307.5351 (2013).
 \bibitem{LRW12} I.~Leader, P.~A.~Russell, M.~Walters, \emph{Transitive sets in Euclidean Ramsey
 theory}, J. Combin. Theory Ser. A \textbf{119} (2012), no.~2, 382--396.
 doi:10.1016/j.jcta.2011.09.005.
