@@ -116,8 +116,8 @@ the corollaries use.
   `native_decide` outside the statement-only `Challenge.lean`.
 - **The trusted surface** is `Challenge.lean`: OpenAI's three definitions, nine lines of further
   definitions (`lorentzForm`, `aug`, `mobiusMap`, `circ`), and the four statements. Read it.
-- **CI.** `.github/workflows/verify.yml` is configured to run all of this on a fresh GitHub
-  runner. It has not run yet: it needs the public repository.
+- **CI.** `.github/workflows/verify.yml` runs all of this on a fresh GitHub runner on every
+  push. It passed on the released commit `52284dd` (run 38339951762).
 - **Fidelity.** `docs/FIDELITY.md` goes through the statements item by item: pairs, metric,
   injectivity, embeddings, junk values, vacuity and the edge cases `d = 0` and `d = 1`.
 
@@ -198,7 +198,7 @@ This is a mixed tree. MIT (`LICENSE`) for this project's files. Apache-2.0
 (`LICENSES/Apache-2.0.txt`) for OpenAI's files under `OAI/`, modified in their headers only (listed
 in `NOTICE` and `docs/PORT-LOG.md`), and for the two unmodified PalomarTemplate scripts under
 `scripts/`. `NOTICE` says which file is under which licence.
-Cite with `CITATION.cff`. Archive: DOI to be added after the first release.
+Cite with `CITATION.cff`, or with the Zenodo DOIs above (concept 10.5281/zenodo.23339522).
 
 ## Authorship
 
