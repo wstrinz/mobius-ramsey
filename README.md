@@ -4,6 +4,8 @@
 
 Archived on Zenodo. Cite all versions with the concept DOI [10.5281/zenodo.23339522](https://doi.org/10.5281/zenodo.23339522); v1.0.0 specifically is [10.5281/zenodo.23339523](https://doi.org/10.5281/zenodo.23339523).
 
+Registered on the Palomar registry as [PALOMAR-2026-10-14-000008](https://palomar-registry.org/entry?id=PALOMAR-2026-10-14-000008&version=1) (version 1, 2026-10-14; archived commit `52284dd`).
+
 **Möbius invariance of the Ramsey property for finite spherical sets, proved in Lean 4.**
 
 A finite set of points in Euclidean space is *Ramsey* if for every number of colours `r ≥ 2`

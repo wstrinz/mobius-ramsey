@@ -1,5 +1,7 @@
 # Citation sources for `note/mobius.tex`
 
+*Record of 2026-10-13, before release; the `\TODO` markers mentioned below were resolved or dropped before v1.0.0.*
+
 How each bibliographic entry and each theorem location in the note was verified. The checks were
 made by an AI agent (Claude; see `DISCLOSURE.md`) on 2026-10-13, read-only, from publisher,
 Crossref, zbMATH, arXiv, GitHub and Google Books records. Nobody read the books cover to cover.

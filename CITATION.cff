@@ -3,6 +3,8 @@ message: "If you use this software, please cite it as below."
 type: software
 title: "mobius-ramsey: Möbius invariance of the Ramsey property for finite spherical sets (Lean 4)"
 version: "1.0.0"
+doi: "10.5281/zenodo.23339522"
+date-released: "2026-10-13"
 authors:
   - family-names: "Strinz"
     given-names: "Will"
